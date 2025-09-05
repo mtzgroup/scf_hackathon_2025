@@ -12,7 +12,7 @@ from terachem_util.units import Bohr
 import numpy as np
 import scipy
 
-from SAD import generate_SAD_guess
+from SAD import generate_SAD_guess_partial_charge
 from utils import read_xyz
 
 import logging
@@ -23,11 +23,13 @@ logging.basicConfig(level=logging.INFO)
 # fmt: off
 atm_names, coords = read_xyz('./test_systems/ferrocene.xyz')
 
+partial_charges = np.zeros(len(atm_names))
+
 # fmt: on
-basis = "3-21gs"
+basis = "3-21g"
 pq_thre = 1e-15
 threspdp = 0.0  # double precision
-maxiter = 200
+maxiter = 100
 energy_conv = 1.0e-6
 drms_conv = 1.0e-3
 
@@ -65,7 +67,7 @@ with use(gpubox([0]), intbox):
     s = np.empty((bi.nao_cart, bi.nao_cart))
     intbox.overlap(s)
     x = np.linalg.inv(scipy.linalg.sqrtm(s))
-    den_spher = generate_SAD_guess(atm_names,coords,basis)
+    den_spher = generate_SAD_guess_partial_charge(atm_names,coords,basis,partial_charges)
     den = bi.spherical_to_cartesian_order2(den_spher)
 
     energy_prev = 0.0
