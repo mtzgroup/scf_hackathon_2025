@@ -3,10 +3,11 @@ A simple SCF driver class
 """
 
 # imports
-from terachem_util.system import System
+from systems import System
 from SAD import generate_SAD_guess_partial_charge
 from RHF import RHF
 from UHF import UHF
+from terachem_util import use, gpubox
 
 class SCF:
     """
@@ -59,17 +60,19 @@ class SCF:
         """
 
         # Generate initial guess from a (charged) SAD
-        D0 = generate_SAD_guess_partial_charge()
-
-        # Run actual SCF calculation
-        if scf_type == 'RHF':
-            print('Running Restricted Hartree-Fock\n')
-            rhf_driver = RHF()
-        elif scf_type == 'UHF':
-            print('Running Unrestricted Hartree-Fock\n')
-            uhf_driver = UHF()
-        else:
-            print('What the fuck are you doing? Use RHF or UHF\n')
+        with use(gpubox([0])):
+            D0 = generate_SAD_guess_partial_charge(self.mol.atm_names,self.basis,self.SAD_charges)
+            print(D0.shape)
+            # Run actual SCF calculation
+            if scf_type == 'RHF':
+                print('Running Restricted Hartree-Fock\n')
+                rhf_driver = RHF()
+            elif scf_type == 'UHF':
+                print('Running Unrestricted Hartree-Fock\n')
+                uhf_driver = UHF(self.mol,self.basis)
+                uhf_driver.kernel(dm0=D0)
+            else:
+                print('What the fuck are you doing? Use RHF or UHF\n')
 
 
         return 0
