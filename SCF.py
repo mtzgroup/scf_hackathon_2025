@@ -66,7 +66,8 @@ class SCF:
             # Run actual SCF calculation
             if scf_type == 'RHF':
                 print('Running Restricted Hartree-Fock\n')
-                rhf_driver = RHF()
+                rhf_driver = RHF(self.mol,self.basis)
+                rhf_driver.kernel(dm0=D0)
             elif scf_type == 'UHF':
                 print('Running Unrestricted Hartree-Fock\n')
                 uhf_driver = UHF(self.mol,self.basis)

@@ -171,8 +171,8 @@ class UHF:
                 Da = Ca0 @ Ca0.T
                 Db = Cb0 @ Cb0.T
             else:
-                Da = dm0
-                Db = dm0
+                Da = 0.5*dm0
+                Db = 0.5*dm0
 
             diis = DIIS(max_vec=self.diis_space)
             energy, energy_prev = 0.0, 0.0
