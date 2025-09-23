@@ -42,7 +42,7 @@ class SCF:
         self.charge = charge
         self.multiplicity = multiplicity
 
-        if SAD_charges==None:
+        if SAD_charges is None:
             self.SAD_charges = [0 for atom in range(len(mol.atm_names))]
         else:
             self.SAD_charges = SAD_charges
@@ -59,10 +59,10 @@ class SCF:
             Type of SCF convergence scheme 'DIIS' or 'SOSCF'
         """
 
-        # Generate initial guess from a (charged) SAD
         with use(gpubox([0])):
+            # Generate initial guess from a (charged) SAD
             D0 = generate_SAD_guess_partial_charge(self.mol.atm_names,self.basis,self.SAD_charges)
-            print(D0.shape)
+
             # Run actual SCF calculation
             if scf_type == 'RHF':
                 print('Running Restricted Hartree-Fock\n')
