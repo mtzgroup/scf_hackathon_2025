@@ -93,9 +93,11 @@ class RHF:
         # Build Fock matrices
         F = hcore + J_buf + K_buf  # K_buf already has -0.5 coefficient from intbox call
         
+        energy = self._rhf_energy(hcore, F, D)
+
         # DIIS - compute error vector first
         diis_error = diis.compute_error(F, D, s, x)
-        diis.add_iteration([F], diis_error, s, x)
+        diis.add_iteration(F, D, s, x)
         drms = diis.get_latest_drms()
         if cycle > 1:
             F = diis.extrapolate_fock()
@@ -109,8 +111,6 @@ class RHF:
 
         # Build new density matrices
         D_new = build_density(C, self.nocc, restricted=True)
-
-        energy = self._rhf_energy(hcore, F, D_new)
 
         return energy, D_new, drms
 

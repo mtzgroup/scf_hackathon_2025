@@ -101,6 +101,9 @@ class UHF:
         # Build Fock matrices
         F_alpha = hcore + J_buf - K_alpha
         F_beta = hcore + J_buf - K_beta
+
+        energy = self._uhf_energy(hcore, J_buf, K_alpha, K_beta, Da, Db)
+
         # DIIS
         diis.add_iteration([F_alpha, F_beta], [Da, Db], s, x)
         drms = diis.get_latest_drms()
@@ -117,8 +120,6 @@ class UHF:
         # Build new density matrices
         Da_new = build_density(Ca, self.nalpha)
         Db_new = build_density(Cb, self.nbeta)
-
-        energy = self._uhf_energy(hcore, J_buf, K_alpha, K_beta, Da_new, Db_new)
 
         return energy, Da_new, Db_new, drms
 
@@ -147,6 +148,7 @@ class UHF:
         with use(intbox):
             # Setup basis and integrals
             bi = populate_basis_shells(intbox, self.basis, self.mol.atm_names)
+            self.bi = bi
             intbox.update_coors(self.pq_thre, self.mol.geometry)
 
             nao = bi.nao_cart
